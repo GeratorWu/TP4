@@ -1,13 +1,27 @@
 import Fastify from "fastify"
 import fastifyBasicAuth from "@fastify/basic-auth"
+import process from "process";
 
+import fs from 'node:fs';
+import path from 'node:path'
+
+import { dirname } from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
 
 const port = 3000;
 const authenticate = {realm: 'Westeros'}
 
 const fastify = Fastify({
-    logger: true
-})
+    http2: true,
+    https: {
+        allowHTTP1: true,
+        key: fs.readFileSync(path.join(__dirname, '..', 'server.key')),
+        cert: fs.readFileSync(path.join(__dirname, '..', 'server.crt')),
+    },
+    logger: true,
+});
 
 fastify.register(fastifyBasicAuth, {
     validate,
